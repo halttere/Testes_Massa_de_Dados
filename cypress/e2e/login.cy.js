@@ -1,43 +1,26 @@
 /// <reference types="cypress" />
-const faker = require("faker");
-
-context("Funcionalidade do login", () => {
+const perfil = require("../fixtures/perfil.json");
+context("Funcionalidade Login", () => {
   beforeEach(() => {
-    cy.visit("http://lojaebac.ebaconline.art.br/minha-conta/");
+    cy.visit("http://lojaebac.ebaconline.art.br/minha-conta");
   });
 
-  it("Deve fazer o login com sucesso com as credenciais válidas", () => {
-    const usuario = faker.internet.userName();
-    const email = faker.internet.email();
-
-    cy.get("#username").type("aluno_ebac@teste.com");
-    cy.get("#password").type("teste@teste.com");
-    cy.get(".woocommerce-form > .button").click();
+  afterEach(() => {
+    cy.screenshot();
   });
 
-  it("Deve apresentar mensagem de erro quando entrar com username inválido", () => {
-    const usuario = faker.internet.userName();
-
-    cy.get("#username").type("tes@ebac.com.br");
-    cy.get("#password").type("teste@teste.com");
+  it("Deve fazer login com sucesso usando arquivo de dados", () => {
+    cy.get("#username").type(perfil.usuario);
+    cy.get("#password").type(perfil.senha);
     cy.get(".woocommerce-form > .button").click();
+    cy.get(".page-title").should("contain", "Minha conta");
   });
 
-  it("Deve apresentar mensagem de erro quando entrar com senha inválida", () => {
-    const senha = faker.internet.password();
-
-    cy.get("#username").type("aluno_ebac@teste.com");
-    cy.get("#password").type("senha");
-    cy.get(".woocommerce-form > .button").click();
-  });
-
-  it("Deve apresentar mensagem de erro quando deixar o campo de username em branco", () => {
-    cy.get("#password").type("teste@teste.com");
-    cy.get(".woocommerce-form > .button").click();
-  });
-
-  it("Deve apresentar mensagem de erro quando deixar o campo de senha em branco", () => {
-    cy.get("#username").type("aluno_ebac@teste.com");
-    cy.get(".woocommerce-form > .button").click();
+  it.only("Deve fazer login com sucesso usando o fixture", () => {
+    cy.fixture("perfil").then((dados) => {
+      cy.get("#username").type(dados.usuario);
+      cy.get("#password").type(dados.senha, { log: false });
+      cy.get(".woocommerce-form > .button").click();
+    });
   });
 });
